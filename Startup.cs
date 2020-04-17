@@ -71,7 +71,7 @@ namespace udemyApp.API
                         if (error != null)
                         {
                             var dbcontext = app.ApplicationServices.GetService<DataContext>();
-                            //context.Response.AddApplicationError(error.Error.Message);
+                            context.Response.AddApplicationError(error.Error.Message);
                             context.Response.AddToApplicationLog(error.Error.Message, error.Error.Source, error.Error.StackTrace, dbcontext);
                             await context.Response.WriteAsync(error.Error.Message);
                         }
