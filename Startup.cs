@@ -70,7 +70,7 @@ namespace udemyApp.API
                         var error = context.Features.Get<IExceptionHandlerFeature>();
                         if (error != null)
                         {
-                            var dbcontext = app.ApplicationServices.GetService<DataContext>();
+                            //var dbcontext = app.ApplicationServices.GetService<DataContext>();
                             //context.Response.AddApplicationError(error.Error.Message);
                             context.Response.AddToApplicationLog(error.Error.Message, error.Error.Source, error.Error.StackTrace, dbcontext);
                             await context.Response.WriteAsync(error.Error.Message);
