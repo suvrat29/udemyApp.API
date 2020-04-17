@@ -12,6 +12,10 @@
   <ItemGroup>
     <Compile Remove="Migrations\20200331170223_InitialCreate.cs" />
     <Compile Remove="Migrations\20200331170223_InitialCreate.Designer.cs" />
+    <Compile Remove="Migrations\20200417184810_AddedErrorlogEntity.cs" />
+    <Compile Remove="Migrations\20200417184810_AddedErrorlogEntity.Designer.cs" />
+    <Compile Remove="Migrations\20200417190440_AddedErrorlogEntity.cs" />
+    <Compile Remove="Migrations\20200417190440_AddedErrorlogEntity.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
