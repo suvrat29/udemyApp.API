@@ -2,9 +2,9 @@ name: .NET Core(wip)
 
 on:
   push:
-    branches: [ * ]
+    branches: [ wip ]
   pull_request:
-    branches: [ * ]
+    branches: [ wip ]
 
 jobs:
   build:
