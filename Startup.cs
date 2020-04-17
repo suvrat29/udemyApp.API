@@ -15,6 +15,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using udemyApp.API.Data;
 using System.Text;
+using System.Net;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
+using udemyApp.API.Helpers;
 
 namespace udemyApp.API
 {
@@ -55,6 +59,24 @@ namespace udemyApp.API
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler(builder => {
+                    builder.Run(async context =>
+                    {
+                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                        var error = context.Features.Get<IExceptionHandlerFeature>();
+                        if (error != null)
+                        {
+                            var dbcontext = app.ApplicationServices.GetService<DataContext>();
+                            //context.Response.AddApplicationError(error.Error.Message);
+                            context.Response.AddToApplicationLog(error.Error.Message, error.Error.Source, error.Error.StackTrace, dbcontext);
+                            await context.Response.WriteAsync(error.Error.Message);
+                        }
+                    });
+                });
             }
 
             //app.UseHttpsRedirection();
