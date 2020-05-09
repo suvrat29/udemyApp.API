@@ -16,6 +16,8 @@
     <Compile Remove="Migrations\20200417184810_AddedErrorlogEntity.Designer.cs" />
     <Compile Remove="Migrations\20200417190440_AddedErrorlogEntity.cs" />
     <Compile Remove="Migrations\20200417190440_AddedErrorlogEntity.Designer.cs" />
+    <Compile Remove="Migrations\20200509105959_ExtendedUserClass.cs" />
+    <Compile Remove="Migrations\20200509105959_ExtendedUserClass.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
