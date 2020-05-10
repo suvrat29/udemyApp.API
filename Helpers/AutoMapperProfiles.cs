@@ -20,6 +20,7 @@ namespace udemyApp.API.Helpers
                 .ForMember(dest => dest.Age,
                 options => options.MapFrom(source => source.DateOfBirth.CalculateAge()));
             CreateMap<Photo, PhotosForDetailedDto>();
+            CreateMap<UserForUpdateDto, User>();
         }
     }
 }

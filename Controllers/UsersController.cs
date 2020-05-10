@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using udemyApp.API.Data;
 using udemyApp.API.Dtos;
+using udemyApp.API.Helpers;
 
 namespace udemyApp.API.Controllers
 {
@@ -17,10 +20,13 @@ namespace udemyApp.API.Controllers
 
         private readonly IMapper _mapper;
 
-        public UsersController(IDatingRepository repo, IMapper mapper)
+        private readonly DataContext _context;
+
+        public UsersController(IDatingRepository repo, IMapper mapper, DataContext context)
         {
             _repo = repo;
             _mapper = mapper;
+            _context = context;
         }
 
         // GET: api/Users
@@ -45,37 +51,47 @@ namespace udemyApp.API.Controllers
             return Ok(userToReturn);
         }
 
-        //// PUT: api/Users/5
-        //// To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        //// more details see https://aka.ms/RazorPagesCRUD.
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutUser(int id, User user)
-        //{
-        //    if (id != user.Id)
-        //    {
-        //        return BadRequest();
-        //    }
+        // PUT: api/Users/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
+        // more details see https://aka.ms/RazorPagesCRUD.
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(int id, UserForUpdateDto userForUpdateDto)
+        {
+            try
+            {
+                if (id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                {
+                    throw new Exception($"The user you are trying to update with id {id} is not authorized to perform this action.");
+                }
+            }
+            catch (Exception error)
+            {
+                Extensions.AddToApplicationLog(error.Message, error.Source, error.StackTrace, _context);
 
-        //    _context.Entry(user).State = EntityState.Modified;
+                return Unauthorized();
+            }
 
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!UserExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
+            try
+            {
+                var userFromRepo = await _repo.GetUser(id);
 
-        //    return NoContent();
-        //}
+                _mapper.Map(userForUpdateDto, userFromRepo);
+
+                if (await _repo.SaveAll())
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    throw new Exception($"Error when updating user {id}. Failed on save.");
+                }
+            }
+            catch (Exception error)
+            {
+                Extensions.AddToApplicationLog(error.Message, error.Source, error.StackTrace, _context);
+                throw;
+            }
+        }
 
         //// POST: api/Users
         //// To protect from overposting attacks, please enable the specific properties you want to bind to, for
