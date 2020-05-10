@@ -10,9 +10,9 @@ namespace udemyApp.API.Helpers
         public AutoMapperProfiles()
         {
             CreateMap<User, UserForListDto>()
-                .ForMember(dest => dest.PhotoUrl, 
+                .ForMember(dest => dest.PhotoUrl,
                 options => options.MapFrom(source => source.Photos.FirstOrDefault(photo => photo.IsMain).Url))
-                .ForMember(dest => dest.Age, 
+                .ForMember(dest => dest.Age,
                 options => options.MapFrom(source => source.DateOfBirth.CalculateAge()));
             CreateMap<User, UserForDetailedDto>()
                 .ForMember(dest => dest.PhotoUrl,

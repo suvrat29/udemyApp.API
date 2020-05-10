@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using udemyApp.API.Data;
 using udemyApp.API.Dtos;
 

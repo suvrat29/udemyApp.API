@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 using udemyApp.API.Data;
 
 namespace DatingApp.API.Controllers
@@ -16,6 +13,7 @@ namespace DatingApp.API.Controllers
     public class ValuesController : ControllerBase
     {
         private readonly DataContext _context;
+
         public ValuesController(DataContext context)
         {
             _context = context;
