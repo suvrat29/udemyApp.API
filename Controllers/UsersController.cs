@@ -66,7 +66,10 @@ namespace udemyApp.API.Controllers
             }
             catch (Exception error)
             {
-                Extensions.AddToApplicationLog(error.Message, error.Source, error.StackTrace, _context);
+                var function = "UpdateUser";
+                var page = "UsersController";
+                var user = $"{id}";
+                Extensions.AddToApplicationLog(error.Message, error.Source, error.StackTrace, function, page, user, _context);
 
                 return Unauthorized();
             }
@@ -88,7 +91,10 @@ namespace udemyApp.API.Controllers
             }
             catch (Exception error)
             {
-                Extensions.AddToApplicationLog(error.Message, error.Source, error.StackTrace, _context);
+                var function = "UpdateUser";
+                var page = "UsersController";
+                var user = $"{id}";
+                Extensions.AddToApplicationLog(error.Message, error.Source, error.StackTrace, function, page, user, _context);
                 throw;
             }
         }

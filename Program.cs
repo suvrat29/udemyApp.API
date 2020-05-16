@@ -26,7 +26,10 @@ namespace udemyApp.API
                 catch (Exception error)
                 {
                     var context = services.GetRequiredService<DataContext>();
-                    Extensions.AddToApplicationLog(error.Message, error.Source, error.StackTrace, context);
+                    var function = "Main";
+                    var page = "Program";
+                    var user = ".NetCore";
+                    Extensions.AddToApplicationLog(error.Message, error.Source, error.StackTrace, function, page, user, context);
                     var logger = services.GetRequiredService<ILogger<Program>>();
                     logger.LogError(error, "An error occured during migration");
                 }

@@ -28,13 +28,16 @@ namespace udemyApp.API.Helpers
             context.SaveChangesAsync();
         }
 
-        public static void AddToApplicationLog(string message, string source, string trace, DataContext context)
+        public static void AddToApplicationLog(string message, string source, string trace, string function, string page, string user, DataContext context)
         {
             var error = new Errorlog
             {
                 Message = message,
                 Source = source,
                 Stacktrace = trace,
+                Function = function,
+                Page = page,
+                User = user,
                 Errortime = DateTime.Now
             };
 
