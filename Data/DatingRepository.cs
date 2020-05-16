@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using udemyApp.API.Models;
 
@@ -24,6 +25,12 @@ namespace udemyApp.API.Data
         {
             _context.Remove(entity);
             //throw new NotImplementedException();
+        }
+
+        public async Task<Photo> GetMainPhotoForUser(int userId)
+        {
+            return await _context.Photos.Where(user => user.UserId == userId).FirstOrDefaultAsync(photo => photo.IsMain);
+            //throw new System.NotImplementedException();
         }
 
         public async Task<Photo> GetPhoto(int id)

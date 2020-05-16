@@ -141,5 +141,77 @@ namespace udemyApp.API.Controllers
                 return BadRequest("Could not add the photo.");
             }
         }
+
+        [HttpPost("{id}/setMain")]
+        public async Task<IActionResult> SetMainPhoto(int userId, int id)
+        {
+            try
+            {
+                if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                {
+                    throw new Exception($"The user you are trying to update with id {userId} is not authorized to perform this action.");
+                }
+            }
+            catch (Exception error)
+            {
+                var function = "SetMainPhoto";
+                var page = "PhotosController";
+                var user = $"{userId}";
+                Extensions.AddToApplicationLog(error.Message, error.Source, error.StackTrace, function, page, user, _context);
+
+                return Unauthorized();
+            }
+
+            try
+            {
+                var user = await _repo.GetUser(userId);
+
+                if (!user.Photos.Any(photo => photo.Id == id))
+                {
+                    throw new Exception($"The user {userId} does not have any such photo uploaded by them, hence it is not authorized to perform this action.");
+                }
+            }
+            catch (Exception error)
+            {
+                var function = "SetMainPhoto";
+                var page = "PhotosController";
+                var user = $"{userId}";
+                Extensions.AddToApplicationLog(error.Message, error.Source, error.StackTrace, function, page, user, _context);
+
+                return Unauthorized();
+            }
+
+            try
+            {
+                var photoFromRepo = await _repo.GetPhoto(id);
+
+                if (photoFromRepo.IsMain)
+                    return BadRequest("This is already set as main photo.");
+
+                var currentMainPhoto = await _repo.GetMainPhotoForUser(userId);
+
+                currentMainPhoto.IsMain = false;
+
+                photoFromRepo.IsMain = true;
+
+                if (await _repo.SaveAll())
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    throw new Exception($"Unable to set the uploaded photo as the user: {userId} main profile photo.");
+                }
+            }
+            catch (Exception error)
+            {
+                var function = "SetMainPhoto";
+                var page = "PhotosController";
+                var user = $"{userId}";
+                Extensions.AddToApplicationLog(error.Message, error.Source, error.StackTrace, function, page, user, _context);
+
+                return BadRequest("Could not set photo to main");
+            }
+        }
     }
 }

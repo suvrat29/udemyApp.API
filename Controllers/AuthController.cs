@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -18,11 +19,13 @@ namespace udemyApp.API.Controllers
     {
         private readonly IAuthRepository _repo;
         private readonly IConfiguration _config;
+        private readonly IMapper _mapper;
 
-        public AuthController(IAuthRepository repo, IConfiguration config)
+        public AuthController(IAuthRepository repo, IConfiguration config, IMapper mapper)
         {
             _config = config;
             _repo = repo;
+            _mapper = mapper;
         }
 
         [HttpPost("register")]
@@ -72,9 +75,12 @@ namespace udemyApp.API.Controllers
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
+            var user = _mapper.Map<UserForListDto>(userFromRepo);
+
             return Ok(new
             {
-                token = tokenHandler.WriteToken(token)
+                token = tokenHandler.WriteToken(token),
+                user
             });
         }
     }
