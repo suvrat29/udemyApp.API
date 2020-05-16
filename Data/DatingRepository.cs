@@ -26,6 +26,14 @@ namespace udemyApp.API.Data
             //throw new NotImplementedException();
         }
 
+        public async Task<Photo> GetPhoto(int id)
+        {
+            var photo = await _context.Photos.FirstOrDefaultAsync(photo => photo.Id == id);
+
+            return photo;
+            //throw new System.NotImplementedException();
+        }
+
         public async Task<User> GetUser(int id)
         {
             var user = await _context.Users.Include(photo => photo.Photos).FirstOrDefaultAsync(user => user.Id == id);
