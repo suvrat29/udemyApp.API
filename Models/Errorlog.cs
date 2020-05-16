@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace udemyApp.API.Models
 {
@@ -11,6 +8,9 @@ namespace udemyApp.API.Models
         public string Message { get; set; }
         public string Source { get; set; }
         public string Stacktrace { get; set; }
+        public string Function { get; set; }
+        public string Page { get; set; }
+        public string User { get; set; }
         public DateTime Errortime { get; set; }
     }
 }
