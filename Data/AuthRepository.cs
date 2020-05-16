@@ -15,7 +15,7 @@ namespace udemyApp.API.Data
 
         public async Task<User> Login(string username, string password)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(user => user.Username == username);
+            var user = await _context.Users.Include(photo => photo.Photos).FirstOrDefaultAsync(user => user.Username == username);
 
             if (user == null)
                 return null;

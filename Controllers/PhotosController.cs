@@ -60,7 +60,7 @@ namespace udemyApp.API.Controllers
             {
                 if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
                 {
-                    throw new Exception($"The user you are trying to update with id {userId} is not authorized to perform this action.");
+                    throw new Exception($"The user photo you are trying to upload with id {userId} is not authorized to perform this action.");
                 }
             }
             catch (Exception error)
@@ -139,6 +139,173 @@ namespace udemyApp.API.Controllers
                 Extensions.AddToApplicationLog(error.Message, error.Source, error.StackTrace, function, page, user, _context);
 
                 return BadRequest("Could not add the photo.");
+            }
+        }
+
+        // POST: api/users/5/setMain
+        [HttpPost("{id}/setMain")]
+        public async Task<IActionResult> SetMainPhoto(int userId, int id)
+        {
+            try
+            {
+                if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                {
+                    throw new Exception($"The user photo you are trying to set as main with id {userId} is not authorized to perform this action.");
+                }
+            }
+            catch (Exception error)
+            {
+                var function = "SetMainPhoto";
+                var page = "PhotosController";
+                var user = $"{userId}";
+                Extensions.AddToApplicationLog(error.Message, error.Source, error.StackTrace, function, page, user, _context);
+
+                return Unauthorized();
+            }
+
+            try
+            {
+                var user = await _repo.GetUser(userId);
+
+                if (!user.Photos.Any(photo => photo.Id == id))
+                {
+                    throw new Exception($"The user {userId} does not have any such photo uploaded by them, hence it is not authorized to perform this action.");
+                }
+            }
+            catch (Exception error)
+            {
+                var function = "SetMainPhoto";
+                var page = "PhotosController";
+                var user = $"{userId}";
+                Extensions.AddToApplicationLog(error.Message, error.Source, error.StackTrace, function, page, user, _context);
+
+                return Unauthorized();
+            }
+
+            try
+            {
+                var photoFromRepo = await _repo.GetPhoto(id);
+
+                if (photoFromRepo.IsMain)
+                    return BadRequest("This is already set as main photo.");
+
+                var currentMainPhoto = await _repo.GetMainPhotoForUser(userId);
+
+                currentMainPhoto.IsMain = false;
+
+                photoFromRepo.IsMain = true;
+
+                if (await _repo.SaveAll())
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    throw new Exception($"Unable to set the uploaded photo as the user: {userId} main profile photo.");
+                }
+            }
+            catch (Exception error)
+            {
+                var function = "SetMainPhoto";
+                var page = "PhotosController";
+                var user = $"{userId}";
+                Extensions.AddToApplicationLog(error.Message, error.Source, error.StackTrace, function, page, user, _context);
+
+                return BadRequest("Could not set photo to main");
+            }
+        }
+
+        // DELETE: /api/users/5/photos/1
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePhoto(int userId, int id)
+        {
+            try
+            {
+                if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                {
+                    throw new Exception($"The user photo you are trying to delete with id {userId} is not authorized to perform this action.");
+                }
+            }
+            catch (Exception error)
+            {
+                var function = "DeletePhoto";
+                var page = "PhotosController";
+                var user = $"{userId}";
+                Extensions.AddToApplicationLog(error.Message, error.Source, error.StackTrace, function, page, user, _context);
+
+                return Unauthorized();
+            }
+
+            try
+            {
+                var user = await _repo.GetUser(userId);
+
+                if (!user.Photos.Any(photo => photo.Id == id))
+                {
+                    throw new Exception($"The user {userId} does not have any such photo uploaded by them, hence it is not authorized to perform this action.");
+                }
+            }
+            catch (Exception error)
+            {
+                var function = "DeletePhoto";
+                var page = "PhotosController";
+                var user = $"{userId}";
+                Extensions.AddToApplicationLog(error.Message, error.Source, error.StackTrace, function, page, user, _context);
+
+                return Unauthorized();
+            }
+
+            try
+            {
+                var photoFromRepo = await _repo.GetPhoto(id);
+
+                if (photoFromRepo.IsMain)
+                    return BadRequest("You cannot delete your main photo.");
+
+                if (photoFromRepo.PublicID != null)
+                {
+                    var deleteParams = new DeletionParams(photoFromRepo.PublicID);
+
+                    var result = _cloudinary.Destroy(deleteParams);
+
+                    if (result.Result == "ok")
+                    {
+                        _repo.Delete(photoFromRepo);
+                    }
+                    else
+                    {
+                        throw new Exception($"Photo deletion for the user: {userId} failed from cloudinary.");
+                    }
+                }
+                else
+                {
+                    if (photoFromRepo.PublicID == null)
+                    {
+                        _repo.Delete(photoFromRepo);
+                    }
+                    else
+                    {
+                        throw new Exception($"Photo deletion for the user: {userId} failed from database.");
+                    }
+                }
+
+                if (await _repo.SaveAll())
+                {
+                    return Ok();
+                }
+                else
+                {
+                    throw new Exception($"Unable to delete the requested photo for the user: {userId}.");
+                }
+            }
+            catch (Exception error)
+            {
+                var function = "DeletePhoto";
+                var page = "PhotosController";
+                var user = $"{userId}";
+                Extensions.AddToApplicationLog(error.Message, error.Source, error.StackTrace, function, page, user, _context);
+
+                return BadRequest("Failed to delete the photo");
             }
         }
     }
